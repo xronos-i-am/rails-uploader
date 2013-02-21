@@ -29,7 +29,7 @@ module Uploader
       end
       
       def id
-        @id ||= @template.dom_id(@object, [method_name, 'uploader'].join('_'))
+        @id ||= @template.dom_id(@object, [method_name, 'uploader', @object.fileupload_guid].join('_'))
       end
       
       def method_name

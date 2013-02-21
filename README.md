@@ -1,3 +1,73 @@
+# this fork adds mongoid support, and works when both simple form and formtastic are loaded
+
+Also nested associations seem to be working
+
+a little howto for mongoid / carrierwave:
+
+    # models/asset.rb
+    class Asset
+      include Mongoid::Document
+      include Uploader::Asset
+
+      field :guid, type: String
+      belongs_to :assetable, polymorphic: true
+    end
+
+    # models/cover.rb
+    class Cover < Asset
+      belongs_to :post
+
+      mount_uploader :data, CoverUploader
+
+      validates :data,
+          :presence => true,
+          :file_size => {
+              :maximum => 5.megabytes.to_i
+          }
+
+      def to_jq_upload
+        [{
+            'id'  => id.to_s,
+            "filename" => File.basename(data.path),
+            "url" => data.url,
+            'thumb_url' => data.thumb.url,
+        }]
+      end
+    end
+
+    # models/post.rb
+    class Post
+      include Mongoid::Document
+      include Uploader::Fileuploads
+      has_one :image, as: :assetable
+      fileuploads :image
+
+      def to_jq_upload
+        [{
+            'id'  => id.to_s,
+            "name" => File.basename(image.path),
+            "url" => image.url,
+            'thumbnail_url' => image.thumb.url,
+        }]
+      end
+    end
+
+    # uploades/cover_uploader.rb
+    class CoverUploader < CarrierWave::Uploader::Base
+      include CarrierWave::MiniMagick
+
+      storage :file
+
+      def store_dir
+        "uploads/covers/#{model.id}"
+      end
+
+      version :thumb do
+        process resize_to_limit: [50, 50]
+      end
+    end
+
+
 # HTML5 File uploader for rails
 
 This gem use https://github.com/blueimp/jQuery-File-Upload for upload files.
