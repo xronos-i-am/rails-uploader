@@ -77,24 +77,27 @@ Find asset by foreign key or guid:
 
 ### Mongoid
 
-No parent asset model is required, one only has to `include Uploader::Asset::Mongoid` into the
-model that should act like an asset:
-
 ``` ruby
-class Picture
+class Asset
   include Mongoid::Document
   include Uploader::Asset::Mongoid
 
-  belongs_to :user
+  belongs_to :assetable, polymorphic: true
+end
+
+class Picture < Asset
+  mount_uploader :data, ImageUploader
+
+  default_scope asc( :sort_order )
 end
 
 class User
   include Mongoid::Document
-  include Uploader::Fileuploads
+  include Uploader::Fileuploads::Mongoid
 
-  has_one :picture, :as => :assetable
+  has_many :pictures, :as => :assetable
 
-  fileuploads :picture
+  fileuploads :pictures
 end
 ```
 
