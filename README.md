@@ -1,10 +1,32 @@
-# this fork adds mongoid support
+# this fork adds mongoid and rails_admin support
 
 This fork works when both simple form and formtastic are loaded
 
-Also nested associations seem to be working
+Also nested associations are working
 
-a little howto for mongoid / carrierwave:
+# HTML5 File uploader for rails
+
+This gem use https://github.com/blueimp/jQuery-File-Upload for upload files.
+
+Preview:
+
+![Uploader in use](http://img39.imageshack.us/img39/2206/railsuploader.png)
+
+
+## Install
+
+In Gemfile:
+``` ruby
+gem "glebtv-rails-uploader"
+```
+
+In routes:
+
+``` ruby
+mount Uploader::Engine => '/uploader'
+```
+
+## HowTo for mongoid / carrierwave:
 
 ### Asset Parent Model (common)
 ``` ruby
@@ -113,27 +135,7 @@ end
     end
 ```
 
-# HTML5 File uploader for rails
-
-This gem use https://github.com/blueimp/jQuery-File-Upload for upload files.
-
-Preview:
-
-![Uploader in use](http://img39.imageshack.us/img39/2206/railsuploader.png)
-
-## Install
-
-In Gemfile:
-
-    gem "glebtv-rails-uploader", require: 'rails-uploader'
-
-In routes:  
-
-``` ruby
-mount Uploader::Engine => '/uploader'
-```
-
-## Usage
+## Usage (Original description)
 
 Architecture to store uploaded files (cancan integration):
 
