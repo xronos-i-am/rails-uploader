@@ -27,7 +27,7 @@ module Uploader
         unless self.is_a?(ClassMethods)
           include InstanceMethods
           extend ClassMethods
-          
+
           after_save :fileuploads_update, :if => :fileupload_changed?
           
           fileuploads_columns.each { |asset| accepts_nested_attributes_for asset, :allow_destroy => true }

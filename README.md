@@ -25,6 +25,9 @@ a little howto for mongoid / carrierwave:
       # DO NOT add this!
       # belongs_to :post
 
+      # optional built-in sorting for rails_admin
+      field :sort, type: Integer
+
       # field name must be 'data'
       mount_uploader :data, CoverUploader
 
@@ -50,6 +53,9 @@ a little howto for mongoid / carrierwave:
     # models/post.rb
     class Post
       include Mongoid::Document
+
+      field :fileupload_guid, type: String
+
       include Uploader::Fileuploads
       has_one :cover, as: :assetable
       fileuploads :cover
@@ -60,16 +66,6 @@ a little howto for mongoid / carrierwave:
 
 ```ruby
 class Album
-  # optional built-in sorting for rails_admin
-  def sort_assets!(order)
-    pos = 0
-    order.each do |pic_id|
-        pic = self.pictures.find(pic_id)
-        pic.sort = (pos+=1)
-        pic.save!
-    end
-  end
-
   has_many :pictures, as: :assetable, dependent: :destroy
   fileuploads :pictures
 
@@ -78,6 +74,7 @@ class Album
   rails_admin do
     edit do
       ...
+      field :fileupload_guid, :hidden # this is needed or else rails_admin sanitizes it away
       field :pictures, :rails_uploader
     end
   end
@@ -110,6 +107,7 @@ end
     rails_admin do
         edit do
           ...
+          field :fileupload_guid, :hidden # this is needed or else rails_admin sanitizes it away
           field :pictures, :rails_uploader
         end
     end

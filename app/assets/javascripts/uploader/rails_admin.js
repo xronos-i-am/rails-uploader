@@ -5,9 +5,7 @@
 //= require uploader/jquery.fileupload
 //= require uploader/jquery.fileupload-ui
 
-$('.uploader-dnd-area input[type=file]').trigger("init.uploader");
-
-$('.uploader-files').each(function() {
+$(document).off('init.sort').on('init.sort', '.uploader-files', function() {
     var $t = $(this);
     $t.sortable({
         update: function(event, ui) {
@@ -23,3 +21,5 @@ $('.uploader-files').each(function() {
         }
     })
 });
+
+$('.uploader-dnd-area input[type=file]').trigger("init.uploader");

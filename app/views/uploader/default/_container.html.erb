@@ -60,6 +60,7 @@
                 $(this).data("fileupload")
                         ._renderDownload(<%=raw fv.to_json(:root => false) %>)
                         .appendTo(container);
+                container.trigger('init.sort');
                 <% end -%>
             }).trigger("init.uploader");
         });

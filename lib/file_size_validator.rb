@@ -1,4 +1,4 @@
-# lib/file_size_validator.rb
+# file_size_validator.rb
 # Based on: https://gist.github.com/795665
 
 class FileSizeValidator < ActiveModel::EachValidator

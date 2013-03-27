@@ -49,7 +49,7 @@ module Uploader
       end
       
       def values
-        if value.first.respond_to?(:sort)
+        if !value.nil? && value.first.respond_to?(:sort)
           Array.wrap(value).sort_by(&:sort)
         else
           Array.wrap(value)

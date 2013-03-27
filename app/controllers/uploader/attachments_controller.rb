@@ -19,10 +19,19 @@ module Uploader
 
     def sort
       @model = params[:assetable_type].safe_constantize
-      @object = @model.find(params[:assetable_id])
 
-      if @object.respond_to?(:sort_assets!)
-        @object.sort_assets!(params[:sort].split('|'))
+      sort = params[:sort].split('|')
+      if params[:assetable_id].blank?
+        @finder = @klass.where(guid: params[:guid])
+      else
+        @finder = @klass.where(assetable_id: params[:assetable_id])
+      end
+
+      @finder.each do |asset|
+        if asset.respond_to?(:sort=)
+          asset.sort = sort.index(asset.id.to_s)
+          asset.save!
+        end
       end
 
       self.status = 200
