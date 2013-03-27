@@ -15,10 +15,15 @@ module Uploader
     def uploader_create(params, request = nil)
       self.guid = params[:guid]
       self.assetable_type = params[:assetable_type]
-      self.assetable_id = params[:assetable_id]
+      if self.class.respond_to?(:collection)
+        self.assetable_id = Moped::BSON::ObjectId.from_string(params[:assetable_id])
+      else
+        self.assetable_id = params[:assetable_id]
+      end
+
       save
     end
-    
+
     # Destroy asset
     # Usage (cancan example):
     #

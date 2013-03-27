@@ -49,7 +49,11 @@ module Uploader
       end
       
       def values
-        Array.wrap(value)
+        if value.first.respond_to?(:sort)
+          Array.wrap(value).sort_by(&:sort)
+        else
+          Array.wrap(value)
+        end
       end
       
       def exists?
@@ -70,6 +74,18 @@ module Uploader
         options[:assetable_id] = @object.id if @object.persisted?
         
         uploader.attachments_path(options)
+      end
+
+      def sort_path(options = {})
+        options = {
+            :guid => @object.fileupload_guid,
+            :assetable_type => @object.class.base_class.name.to_s,
+            :klass => klass.to_s
+        }.merge(options)
+
+        options[:assetable_id] = @object.id if @object.persisted?
+
+        uploader.sort_attachments_path(options)
       end
       
       def input_html

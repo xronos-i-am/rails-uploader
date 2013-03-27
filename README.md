@@ -1,9 +1,13 @@
-# this fork adds mongoid support, and works when both simple form and formtastic are loaded
+# this fork adds mongoid support
+
+This fork works when both simple form and formtastic are loaded
 
 Also nested associations seem to be working
 
 a little howto for mongoid / carrierwave:
 
+### Asset Parent Model (common)
+``` ruby
     # models/asset.rb
     class Asset
       include Mongoid::Document
@@ -12,11 +16,16 @@ a little howto for mongoid / carrierwave:
       field :guid, type: String
       belongs_to :assetable, polymorphic: true
     end
+```
 
+### Your asset model
+``` ruby
     # models/cover.rb
     class Cover < Asset
-      belongs_to :post
+      # DO NOT add this!
+      # belongs_to :post
 
+      # field name must be 'data'
       mount_uploader :data, CoverUploader
 
       validates :data,
@@ -34,24 +43,50 @@ a little howto for mongoid / carrierwave:
         }]
       end
     end
+```
 
+### Model to which you want to add assets
+```ruby
     # models/post.rb
     class Post
       include Mongoid::Document
       include Uploader::Fileuploads
-      has_one :image, as: :assetable
-      fileuploads :image
-
-      def to_jq_upload
-        [{
-            'id'  => id.to_s,
-            "name" => File.basename(image.path),
-            "url" => image.url,
-            'thumbnail_url' => image.thumb.url,
-        }]
-      end
+      has_one :cover, as: :assetable
+      fileuploads :cover
     end
+```
 
+### has_many
+
+```ruby
+class Album
+  # optional built-in sorting for rails_admin
+  def sort_assets!(order)
+    pos = 0
+    order.each do |pic_id|
+        pic = self.pictures.find(pic_id)
+        pic.sort = (pos+=1)
+        pic.save!
+    end
+  end
+
+  has_many :pictures, as: :assetable, dependent: :destroy
+  fileuploads :pictures
+
+  accepts_nested_attributes_for :pictures
+
+  rails_admin do
+    edit do
+      ...
+      field :pictures, :rails_uploader
+    end
+  end
+end
+
+```
+
+### CarrierWave uploader - all like usual
+```ruby
     # uploades/cover_uploader.rb
     class CoverUploader < CarrierWave::Uploader::Base
       include CarrierWave::MiniMagick
@@ -66,7 +101,19 @@ a little howto for mongoid / carrierwave:
         process resize_to_limit: [50, 50]
       end
     end
+```
 
+# Active Admin and RailsAdmin are both working
+
+# RailsAdmin Integration
+``` ruby
+    rails_admin do
+        edit do
+          ...
+          field :pictures, :rails_uploader
+        end
+    end
+```
 
 # HTML5 File uploader for rails
 
@@ -80,7 +127,7 @@ Preview:
 
 In Gemfile:
 
-  gem "rails-uploader"
+    gem "glebtv-rails-uploader", require: 'rails-uploader'
 
 In routes:  
 

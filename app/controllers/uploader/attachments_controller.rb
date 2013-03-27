@@ -16,9 +16,30 @@ module Uploader
       @asset.uploader_destroy(params, request)
       render_resourse(@asset, 200)
     end
+
+    def sort
+      @model = params[:assetable_type].safe_constantize
+      @object = @model.find(params[:assetable_id])
+
+      if @object.respond_to?(:sort_assets!)
+        @object.sort_assets!(params[:sort].split('|'))
+      end
+
+      self.status = 200
+      self.content_type = "application/json"
+      self.response_body = '{"ok": true}'
+    end
     
     protected
-    
+
+
+      def airbrake_request_data
+        {
+            :controller       => params[:controller],
+            :action           => params[:action],
+        }
+      end
+
       def find_klass
         @klass = params[:klass].blank? ? nil : params[:klass].safe_constantize
         raise ActionController::RoutingError.new("Class not found #{params[:klass]}") if @klass.nil?

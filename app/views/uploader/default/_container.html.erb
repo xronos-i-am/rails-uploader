@@ -10,7 +10,7 @@
         <%= hidden_field(field.object_name, :fileupload_guid, :object => field.object) %>
     <% # end %>
 
-    <div class="uploader-files"></div>
+    <div class="uploader-files" data-sort-path="<%= field.sort_path %>"></div>
 
     <div class="uploader-dnd-hints">
       <div class="uploader-button gray fileinput-button">
@@ -28,7 +28,6 @@
       </div>
     </div>
 
-    <%= render :partial => "uploader/#{field.theme}/init", :locals => {:field => field} %>
     <%= render :partial => "uploader/#{field.theme}/upload", :locals => {:field => field} %>
     <%= render :partial => "uploader/#{field.theme}/download", :locals => {:field => field} %>
 
@@ -36,7 +35,12 @@
         $(function () {
             var container = $("#<%= field.id %> div.uploader-files");
 
-            $('#<%= field.id %> input[type="file"]').attr('name', 'uploader_field').bind("init.uploader",function (e) {
+            $('#<%= field.id %> input[type="file"]').attr('name', 'uploader_field').bind("init.uploader", function (e) {
+                if (!$.fn.fileupload) {
+                    // not yet loaded
+                    return false;
+                }
+
                 $(this).fileupload({
                     dataType: 'json',
                     dropZone: $("#<%= field.id %>"),
