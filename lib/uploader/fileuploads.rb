@@ -40,6 +40,7 @@ module Uploader
       def fileupload_update(record_id, guid, method)
         query = fileupload_klass(method).where(:guid => guid, :assetable_type => base_class.name.to_s)
         record_id = Moped::BSON::ObjectId.from_string(record_id) unless record_id.class.name == "Moped::BSON::ObjectId"
+        p record_id
         query.update_all(:assetable_id => record_id, :guid => nil)
       end
 

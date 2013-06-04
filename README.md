@@ -39,7 +39,7 @@ mount Uploader::Engine => '/uploader'
       belongs_to :assetable, polymorphic: true
 
       # this workaround is sometimes needed so IDs are ObjectIDs not strings  before_save do
-      if !assetable_id.blank? && !assetable_id.class.name == "Moped::BSON::ObjectId" && Moped::BSON::ObjectId.legal?(assetable_id)
+      if !assetable_id.blank? && assetable_id.class.name != "Moped::BSON::ObjectId" && Moped::BSON::ObjectId.legal?(assetable_id)
         self.assetable_id = Moped::BSON::ObjectId.from_string(assetable_id)
       end
       true
