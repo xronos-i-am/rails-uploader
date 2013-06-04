@@ -7,8 +7,7 @@ class UploaderInput
 
   def to_html
     input_wrapping do
-      label_html <<
-          builder.uploader_field(method, input_html_options)
+      label_html << builder.uploader_field(method, input_html_options)
     end
   end
 end

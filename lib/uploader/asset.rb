@@ -5,7 +5,7 @@ module Uploader
     #
     #   class Asset < ActiveRecord::Base
     #     include Uploader::Asset
-    #     
+    #
     #     def uploader_create(params, request = nil)
     #       self.user = request.env['warden'].user
     #       super
@@ -29,7 +29,7 @@ module Uploader
     #
     #   class Asset < ActiveRecord::Base
     #     include Uploader::Asset
-    #     
+    #
     #     def uploader_destroy(params, request = nil)
     #       ability = Ability.new(request.env['warden'].user)
     #       if ability.can? :delete, self
