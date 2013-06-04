@@ -37,7 +37,6 @@
 
             $('#<%= field.id %> input[type="file"]').attr('name', 'uploader_field').bind("init.uploader", function (e) {
                 if (!$.fn.fileupload) {
-                    // not yet loaded
                     return false;
                 }
 
@@ -56,7 +55,7 @@
                 });
 
                 <% if field.exists? -%>
-                <% fv = field.values.map { |v| v.respond_to?(:to_jq_upload) ? v.to_jq_upload.first : v } %>
+                <% fv = field.values.map { |v| v.respond_to?(:to_jq_upload) ? v.to_jq_upload : v } %>
                 $(this).data("fileupload")
                         ._renderDownload(<%=raw fv.to_json(:root => false) %>)
                         .appendTo(container);
