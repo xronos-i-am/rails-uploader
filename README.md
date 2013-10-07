@@ -67,12 +67,12 @@ mount Uploader::Engine => '/uploader'
           }
 
       def to_jq_upload
-        [{
+        {
             'id'  => id.to_s,
             "filename" => File.basename(data.path),
             "url" => data.url,
             'thumb_url' => data.thumb.url,
-        }]
+        }
       end
     end
 ```

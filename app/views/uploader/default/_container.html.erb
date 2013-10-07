@@ -56,7 +56,7 @@
 
                 <% if field.exists? -%>
                 <% fv = field.values.map { |v| v.respond_to?(:to_jq_upload) ? v.to_jq_upload : v } %>
-                $(this).data("fileupload")
+                $(this).data().blueimpFileupload
                         ._renderDownload(<%=raw fv.to_json(:root => false) %>)
                         .appendTo(container);
                 <% end -%>
