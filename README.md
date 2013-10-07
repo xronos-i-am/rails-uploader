@@ -205,6 +205,7 @@ Find asset by foreign key or guid:
 Javascripts:
 
 ``` ruby
+//= require jquery.ui.widget
 //= require uploader/application
 ```
 
