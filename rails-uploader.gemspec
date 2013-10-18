@@ -18,9 +18,9 @@ Gem::Specification.new do |s|
   s.extra_rdoc_files = ["README.md"]
   s.require_paths = ["lib"]
   
-  s.add_development_dependency "sqlite3"
-  s.add_development_dependency "carrierwave"
-  s.add_development_dependency "carrierwave-mongoid"
+  s.add_dependency "mongoid", [">= 4.0", "< 5.0"]
+  
+  s.add_development_dependency "glebtv-carrierwave-mongoid"
   s.add_development_dependency "rails", ">= 3.2.13"
   s.add_development_dependency "mini_magick"
   s.add_development_dependency "jquery-rails"
