@@ -1,4 +1,5 @@
-## this fork adds mongoid and rails_admin support
+## this fork adds mongoid and rails_admin support. 
+## ActiveRecord support is dropped!
 
 This fork works when both simple form and formtastic are loaded
 
@@ -40,8 +41,11 @@ mount Uploader::Engine => '/uploader'
 
       # this workaround is sometimes needed so IDs are ObjectIDs not strings  
       before_save do
-        if !assetable_id.blank? && assetable_id.class.name != "Moped::BSON::ObjectId" && Moped::BSON::ObjectId.legal?(assetable_id)
-          self.assetable_id = Moped::BSON::ObjectId.from_string(assetable_id)
+        return true if self.assetable_id.nil? || !self.assetable_id.is_a?(String)
+        if defined?(Moped::BSON)
+          self.assetable_id = Moped::BSON::ObjectId.from_string(self.assetable_id) if Moped::BSON::ObjectId.legal?(self.assetable_id)
+        else
+          self.assetable_id = BSON::ObjectId.from_string(self.assetable_id) if BSON::ObjectId.legal?(self.assetable_id)
         end
         true
       end

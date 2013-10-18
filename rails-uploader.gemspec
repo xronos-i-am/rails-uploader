@@ -20,7 +20,8 @@ Gem::Specification.new do |s|
   
   s.add_development_dependency "sqlite3"
   s.add_development_dependency "carrierwave"
-  s.add_development_dependency "rails", "3.2.13"
+  s.add_development_dependency "carrierwave-mongoid"
+  s.add_development_dependency "rails", ">= 3.2.13"
   s.add_development_dependency "mini_magick"
   s.add_development_dependency "jquery-rails"
   s.add_development_dependency "rspec-rails", "~> 2.12.1"

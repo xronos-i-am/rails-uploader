@@ -1,7 +1,11 @@
-class Article < ActiveRecord::Base
-  attr_accessible :content, :title
+class Article
+  include Mongoid::Document
+  include Uploader::Fileuploads
+
+  field :content
+  field :title
   
-  has_one :picture, :as => :assetable, :dependent => :destroy
+  has_one :picture, as: :assetable, dependent: :destroy
 
   fileuploads :picture
 end

@@ -11,7 +11,7 @@ describe Uploader::AttachmentsController do
     file = Rack::Test::UploadedFile.new('spec/factories/files/rails.png', "image/png")
     post "/uploader/attachments", {
       :klass => "Picture", 
-      :assetable_id => "1",
+      :assetable_id => "507f1f77bcf86cd799439011",
       :assetable_type => "Article",
       :guid => "SOMESTRING",
       :asset => {:data => file}

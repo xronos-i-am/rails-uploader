@@ -19,9 +19,9 @@ describe Uploader::Fileuploads do
   end
 
   it "should update asset target_id by guid" do
-    Article.fileupload_update(1000, @picture.guid, :picture)
+    Article.fileupload_update('507f1f77bcf86cd799439011', @picture.guid, :picture)
     @picture.reload
-    @picture.assetable_id.should == 1000
+    @picture.assetable_id.to_s.should == '507f1f77bcf86cd799439011'
     @picture.guid.should be_nil
   end
 

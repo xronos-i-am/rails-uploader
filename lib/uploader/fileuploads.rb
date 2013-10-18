@@ -5,16 +5,7 @@ module Uploader
     end
 
     module SingletonMethods
-      # Join ActiveRecord object with uploaded file
-      # Usage:
-      #
-      #   class Article < ActiveRecord::Base
-      #     has_one :picture, :as => :assetable, :dependent => :destroy
-      #
-      #     fileuploads :picture
-      #   end
-      #
-      #
+      # Join Mongoid object with uploaded file
       def fileuploads(*args)
         options = args.extract_options!
 
@@ -39,15 +30,18 @@ module Uploader
       # Update reflection klass by guid
       def fileupload_update(record_id, guid, method)
         query = fileupload_klass(method).where(:guid => guid, :assetable_type => base_class.name.to_s)
-        record_id = Moped::BSON::ObjectId.from_string(record_id) unless record_id.class.name == "Moped::BSON::ObjectId"
-        p record_id
+        if defined?( Moped::BSON )
+          record_id = Moped::BSON::ObjectId.from_string(record_id) unless record_id.class.name == "Moped::BSON::ObjectId"
+        else 
+          record_id = BSON::ObjectId.from_string(record_id) unless record_id.class.name == "BSON::ObjectId"
+        end
         query.update_all(:assetable_id => record_id, :guid => nil)
       end
 
       # Find asset by guid
       def fileupload_find(method, guid)
         klass = fileupload_klass(method)
-        klass.where(:guid => guid)
+        klass.where(:guid => guid).first
       end
 
       # Find class by reflection

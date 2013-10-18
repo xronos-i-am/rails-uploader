@@ -1,5 +1,5 @@
+# encoding: utf-8
+
 class Picture < Asset
-  mount_uploader :data, PictureUploader, :mount_on => :data_file_name
-  
-  attr_accessible :data
+  mount_uploader :data, PictureUploader, mount_on: :data_file_name
 end

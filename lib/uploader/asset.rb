@@ -16,7 +16,11 @@ module Uploader
       self.guid = params[:guid]
       self.assetable_type = params[:assetable_type]
       if self.class.respond_to?(:collection) && !params[:assetable_id].blank?
-        self.assetable_id = Moped::BSON::ObjectId.from_string(params[:assetable_id])
+        if defined?( Moped::BSON )
+          self.assetable_id = Moped::BSON::ObjectId.from_string(params[:assetable_id])
+        else
+          self.assetable_id = BSON::ObjectId.from_string(params[:assetable_id])
+        end
       else
         self.assetable_id = params[:assetable_id]
       end
