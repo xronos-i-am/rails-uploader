@@ -2,50 +2,78 @@
 module Uploader
   class AttachmentsController < ActionController::Metal
     include AbstractController::Callbacks
-  
+
     before_filter :find_klass
-    
+
     def create
       @asset = @klass.new(params[:asset])
       @asset.uploader_create(params, request)
       render_resourse(@asset, 201)
     end
-    
-    def update
-      @assets = Array.wrap(params[:assets] || [])
-
-      @assets.each_with_index do |id, index|
-        @klass.where(:id => id).update_all(:sort_order => index)
-      end
-
-      render_json(:files => [])
-    end
 
     def destroy
-      @asset = @klass.find(params[:id])
+      begin
+        @asset = @klass.find(params[:id])
+      rescue
+        @asset = @klass.where(guid: params[:guid])
+      end
       @asset.uploader_destroy(params, request)
       render_resourse(@asset, 200)
     end
-    
-    protected
-    
-      def find_klass
-        @klass = Uploader.constantize(params[:klass])
-        raise ActionController::RoutingError.new("Class not found #{params[:klass]}") if @klass.nil?
+
+    def sort
+      @model = params[:assetable_type].safe_constantize
+
+      sort = params[:sort].split('|')
+      if params[:assetable_id].blank?
+        @finder = @klass.where(guid: params[:guid])
+      else
+        @finder = @klass.where(assetable_id: params[:assetable_id])
       end
-      
-      def render_resourse(record, status = 200)
-        if record.errors.empty?
-          render_json({:files => [record]}, status)
-        else
-          render_json(record.errors, 422)
+
+      @finder.each do |asset|
+        if asset.respond_to?(:sort=)
+          asset.sort = sort.index(asset.id.to_s)
+          asset.save!
         end
       end
-      
-      def render_json(hash_or_object, status = 200)
+
+      self.status = 200
+      self.content_type = "application/json"
+      self.response_body = '{"ok": true}'
+    end
+
+    protected
+
+
+      def airbrake_request_data
+        {
+            :controller       => params[:controller],
+            :action           => params[:action],
+        }
+      end
+
+      def find_klass
+        @klass = params[:klass].blank? ? nil : params[:klass].safe_constantize
+        raise ActionController::RoutingError.new("Class not found #{params[:klass]}") if @klass.nil?
+      end
+
+      def render_resourse(record, status = 200)
+        if record.errors.empty?
+          if record.respond_to?(:to_jq_upload)
+            render_json({'files' => Array.wrap(record.to_jq_upload)}.to_json, status)
+          else
+            render_json({'files' => Array.wrap(record)}.to_json, status)
+          end
+        else
+          render_json([record.errors].to_json, 422)
+        end
+      end
+
+      def render_json(body, status = 200)
         self.status = status
         self.content_type = "application/json"
-        self.response_body = hash_or_object.to_json(:root => false)
+        self.response_body = body
       end
   end
 end

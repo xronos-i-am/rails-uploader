@@ -1,63 +1,67 @@
+<% if field.object_name =~ /.*\[.*\]\[(.*)\]/ %>
+    <% assoc = true %>
+    <% field.object.fileupload_guid = field.object.fileupload_guid + '_' + $1 %>
+<% else %>
+    <% assoc = false %>
+<% end %>
+
 <%= content_tag(:div, :id => field.id, :class => "uploader-dnd-area") do -%>
-  <%= hidden_field(field.object_name, :fileupload_guid, :object => field.object) if field.object.new_record? %>
-  
-  <div class="uploader-files"></div>
-  
-	<div class="uploader-dnd-hints">  
-	  <span class="uploader-button gray fileinput-button">
-      <span><%= I18n.t('uploader.button') %></span>
-      <%= fields_for field.object do |f| -%>
-	      <%= f.fields_for field.method_name, field.klass.new do |m| -%>
-          <%= m.file_field(:data, field.input_html) %>
-	      <% end -%>
-	    <% end -%>
-    </span>
-    
-	  <div class="uploader-dnd-hint">
-		  <%= I18n.t('uploader.or') %><span><%= I18n.t('uploader.drop') %></span>
-	  </div>
-	</div>
-	
-	<%= render :partial => "uploader/#{field.theme}/upload", :locals => {:field => field} %>
-  <%= render :partial => "uploader/#{field.theme}/download", :locals => {:field => field} %>
-  <%= render :partial => "uploader/#{field.theme}/sortable", :locals => {:field => field} if field.sortable? %>
-  
-	<script type="text/javascript">
-    $(function() {
-      var uploader, container;
-      container = $("#<%= field.id %> div.uploader-files");
-      
-      $('#<%= field.id %> input[type="file"]').each(function(e) {
-        $(this).fileupload({
-          dataType: 'json',
-          dropZone: $("#<%= field.id %>"),
-          autoUpload: true,
-          paramName: "asset[data]",
-          formData: function(form){ return []; },
-          filesContainer: container,
-          namespace: 'uploader',
-          uploadTemplateId: 'template-upload-<%= field.klass %>',
-          downloadTemplateId: 'template-download-<%= field.klass %>'
+    <% # if assoc || field.object.new_record? %>
+        <%= hidden_field(field.object_name, :fileupload_guid, :object => field.object) %>
+    <% # end %>
+
+    <div class="uploader-files" data-sort-path="<%= field.sort_path %>"></div>
+
+    <div class="uploader-dnd-hints">
+      <div class="uploader-button gray fileinput-button">
+        <div><%= I18n.t('uploader.button') %></div>
+        <%= fields_for field.object do |f| -%>
+            <%= f.fields_for field.method_name, field.klass.new do |m| -%>
+                <%= m.file_field(:data, field.input_html) %>
+            <% end -%>
+        <% end -%>
+      </div>
+
+      <div class="uploader-dnd-hint">
+        <%= I18n.t('uploader.or') %>
+        <span><%= I18n.t('uploader.drop') %></span>
+      </div>
+    </div>
+
+    <%= render :partial => "uploader/#{field.theme}/upload", :locals => {:field => field} %>
+    <%= render :partial => "uploader/#{field.theme}/download", :locals => {:field => field} %>
+
+    <script type="text/javascript">
+        $(function () {
+            var container = $("#<%= field.id %> div.uploader-files");
+
+            $('#<%= field.id %> input[type="file"]').attr('name', 'uploader_field').bind("init.uploader", function (e) {
+                if (!$.fn.fileupload) {
+                    return false;
+                }
+
+                $(this).fileupload({
+                    dataType: 'json',
+                    dropZone: $("#<%= field.id %>"),
+                    autoUpload: true,
+                    paramName: "asset[data]",
+                    formData: function (form) {
+                        return [];
+                    },
+                    filesContainer: container,
+                    namespace: 'uploader',
+                    uploadTemplateId: 'template-upload-<%= field.klass %>',
+                    downloadTemplateId: 'template-download-<%= field.klass %>'
+                });
+
+                <% if field.exists? -%>
+                <% fv = field.values.map { |v| v.respond_to?(:to_jq_upload) ? v.to_jq_upload : v } %>
+                $(this).data().blueimpFileupload
+                        ._renderDownload(<%=raw fv.to_json(:root => false) %>)
+                        .appendTo(container);
+                <% end -%>
+                container.trigger('init.sort');
+            }).trigger("init.uploader");
         });
-
-        <% if field.confirm_delete -%>
-          var fu = $(this).data("fileupload")
-          fu.options._oldDestroy = fu.options.destroy
-
-          fu.options.destroy = function(e, data) {
-            if (confirm("<%= field.confirm_message.gsub('"', '\\"') %>")) {
-              fu.options._oldDestroy.call(this, e, data);
-            }
-          };
-        <% end -%>
-        
-        <% if field.exists? -%>
-          uploader = ($(this).data('blueimp-fileupload') || $(this).data('fileupload'));
-          uploader
-            ._renderDownload(<%=raw field.values.to_json(:root => false) %>)
-            .appendTo(container);
-        <% end -%>
-      });
-    });
-  </script>
+    </script>
 <% end -%>

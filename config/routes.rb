@@ -1,3 +1,7 @@
 Uploader::Engine.routes.draw do
-  resources :attachments, :only => [:create, :update, :destroy]
+  resources :attachments, :only => [:create, :destroy] do
+    collection do
+      post :sort
+    end
+  end
 end

@@ -6,4 +6,4 @@ class SimpleFormUploaderInput < SimpleForm::Inputs::Base
   end
 end
 
-::SimpleForm::FormBuilder.map_type :uploader, to: SimpleFormUploaderInput 
+::SimpleForm::FormBuilder.map_type :uploader, :to => SimpleFormUploaderInput

@@ -20,6 +20,7 @@ module Uploader
   end
   
   def self.assets
+    ['uploader/application.css', 'uploader/application.js', 'uploader/rails_admin.js'] +
     Dir[root_path.join('vendor/assets/javascripts/uploader/**', '*.{js,css}')].inject([]) do |list, path|
       list << Pathname.new(path).relative_path_from(root_path.join('vendor/assets/javascripts')).to_s
       list
@@ -33,3 +34,7 @@ module Uploader
 end
 
 require 'uploader/engine'
+
+if Object.const_defined?("RailsAdmin")
+  require "uploader/rails_admin/field"
+end
