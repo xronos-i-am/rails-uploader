@@ -18,6 +18,7 @@ ActionMailer::Base.default_url_options[:host] = "test.com"
 Rails.backtrace_cleaner.remove_silencers!
 
 # Run any available migration
+ActiveRecord::Migrator.migrate File.expand_path("../dummy/db/migrate/", __FILE__)
 
 require 'carrierwave'
 CarrierWave.configure do |config|
@@ -42,14 +43,17 @@ RSpec.configure do |config|
   config.mock_with :rspec
   
   config.before(:suite) do
-    DatabaseCleaner.strategy = :truncation
+    DatabaseCleaner[:active_record].strategy = :truncation
+    DatabaseCleaner[:mongoid].strategy = :truncation
   end
 
   config.before(:all) do
-    DatabaseCleaner.start
+    DatabaseCleaner[:active_record].start
+    DatabaseCleaner[:mongoid].start
   end
 
   config.after(:all) do
-    DatabaseCleaner.clean
+    DatabaseCleaner[:active_record].clean
+    DatabaseCleaner[:mongoid].clean
   end
 end

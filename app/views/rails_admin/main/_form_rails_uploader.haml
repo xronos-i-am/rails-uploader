@@ -1,10 +1,1 @@
-= stylesheet_link_tag "uploader/application.css"
-= form.send 'uploader_field', field.method_name, field.html_attributes
-:javascript
-  (function(d, s, id) {
-    var js, fjs = d.getElementsByTagName(s)[0];
-    if (d.getElementById(id)) return;
-    js = d.createElement(s); js.id = id;
-    js.src = "/assets/uploader/rails_admin.js";
-    fjs.parentNode.appendChild(js);
-  }(document, 'script', 'uploader-jssdk'));
+= form.uploader_field(field.method_name, field.html_attributes.merge(sortable: true))

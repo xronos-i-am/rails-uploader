@@ -1,79 +1,57 @@
-# encoding: utf-8
 module Uploader
   class AttachmentsController < ActionController::Metal
     include AbstractController::Callbacks
-
+  
     before_filter :find_klass
-
+    before_filter :find_asset, :only => [:destroy]
+    
     def create
       @asset = @klass.new(params[:asset])
       @asset.uploader_create(params, request)
       render_resourse(@asset, 201)
     end
+    
+    def update
+      @assets = Array.wrap(params[:assets] || [])
+
+      @assets.each_with_index do |id, index|
+        @klass.where(:id => id).update_all(:sort => index)
+      end
+
+      render_json({files: []})
+    end
 
     def destroy
-      begin
-        @asset = @klass.find(params[:id])
-      rescue
-        @asset = @klass.where(guid: params[:guid])
-      end
       @asset.uploader_destroy(params, request)
-      render_resourse(@asset, 200)
+      render_json({success: true})
     end
-
-    def sort
-      @model = params[:assetable_type].safe_constantize
-
-      sort = params[:sort].split('|')
-      if params[:assetable_id].blank?
-        @finder = @klass.where(guid: params[:guid])
-      else
-        @finder = @klass.where(assetable_id: params[:assetable_id])
-      end
-
-      @finder.each do |asset|
-        if asset.respond_to?(:sort=)
-          asset.sort = sort.index(asset.id.to_s)
-          asset.save!
-        end
-      end
-
-      self.status = 200
-      self.content_type = "application/json"
-      self.response_body = '{"ok": true}'
-    end
-
+    
     protected
-
-
-      def airbrake_request_data
-        {
-            :controller       => params[:controller],
-            :action           => params[:action],
-        }
-      end
-
+    
       def find_klass
-        @klass = params[:klass].blank? ? nil : params[:klass].safe_constantize
+        @klass = Uploader.constantize(params[:klass])
         raise ActionController::RoutingError.new("Class not found #{params[:klass]}") if @klass.nil?
       end
 
+      def find_asset
+        @asset = @klass.where(:public_token => params[:id]).first
+        raise ActionController::RoutingError.new("Asset not found by guid #{params[:id]}") if @asset.nil? 
+      end
+      
       def render_resourse(record, status = 200)
         if record.errors.empty?
-          if record.respond_to?(:to_jq_upload)
-            render_json({'files' => Array.wrap(record.to_jq_upload)}.to_json, status)
-          else
-            render_json({'files' => Array.wrap(record)}.to_json, status)
-          end
+          render_json({:files => [record.to_jq_upload]}, status)
         else
-          render_json([record.errors].to_json, 422)
+          render_json(record.errors, 422)
         end
       end
+      
+      def render_json(hash_or_object, status = 200)
+        ctype = env["HTTP_USER_AGENT"] && env["HTTP_USER_AGENT"].include?("Android") ? "text/plain" : "application/json"
 
-      def render_json(body, status = 200)
         self.status = status
-        self.content_type = "application/json"
-        self.response_body = body
+        self.content_type = ctype
+        self.response_body = hash_or_object.to_json(:root => false)
       end
   end
 end

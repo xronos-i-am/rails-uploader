@@ -1,11 +1,4 @@
-## this fork adds mongoid and rails_admin support. 
-## ActiveRecord support is dropped!
-
-This fork works when both simple form and formtastic are loaded
-
-Also nested associations are working
-
-## HTML5 File uploader for rails
+# HTML5 File uploader for rails
 
 This gem use https://github.com/blueimp/jQuery-File-Upload for upload files.
 
@@ -13,12 +6,12 @@ Preview:
 
 ![Uploader in use](http://img39.imageshack.us/img39/2206/railsuploader.png)
 
-
 ## Install
 
 In Gemfile:
-``` ruby
-gem "glebtv-rails-uploader"
+
+```
+gem "rails-uploader"
 ```
 
 In routes:
@@ -27,127 +20,13 @@ In routes:
 mount Uploader::Engine => '/uploader'
 ```
 
-## HowTo for mongoid / carrierwave:
+Migration for ActiveRecord:
 
-### Asset Parent Model (common)
-``` ruby
-    # models/asset.rb
-    class Asset
-      include Mongoid::Document
-      include Uploader::Asset
-
-      field :guid, type: String
-      belongs_to :assetable, polymorphic: true
-
-      # this workaround is sometimes needed so IDs are ObjectIDs not strings  
-      before_save do
-        return true if self.assetable_id.nil? || !self.assetable_id.is_a?(String)
-        if defined?(Moped::BSON)
-          self.assetable_id = Moped::BSON::ObjectId.from_string(self.assetable_id) if Moped::BSON::ObjectId.legal?(self.assetable_id)
-        else
-          self.assetable_id = BSON::ObjectId.from_string(self.assetable_id) if BSON::ObjectId.legal?(self.assetable_id)
-        end
-        true
-      end
-    end
-  ```
-
-### Your asset model
-``` ruby
-    # models/cover.rb
-    class Cover < Asset
-      # DO NOT add this!
-      # belongs_to :post
-
-      # optional built-in sorting for rails_admin
-      field :sort, type: Integer
-
-      # field name must be 'data'
-      mount_uploader :data, CoverUploader
-
-      validates :data,
-          :presence => true,
-          :file_size => {
-              :maximum => 5.megabytes.to_i
-          }
-
-      def to_jq_upload
-        {
-            'id'  => id.to_s,
-            "filename" => File.basename(data.path),
-            "url" => data.url,
-            'thumb_url' => data.thumb.url,
-        }
-      end
-    end
+```bash
+$> rake uploader:install:migrations
 ```
 
-### Model to which you want to add assets
-```ruby
-    # models/post.rb
-    class Post
-      include Mongoid::Document
-
-      field :fileupload_guid, type: String
-
-      include Uploader::Fileuploads
-      has_one :cover, as: :assetable
-      fileuploads :cover
-    end
-```
-
-### has_many
-
-```ruby
-class Album
-  has_many :pictures, as: :assetable, dependent: :destroy
-  fileuploads :pictures
-
-  accepts_nested_attributes_for :pictures
-
-  rails_admin do
-    edit do
-      ...
-      field :fileupload_guid, :hidden # this is needed or else rails_admin sanitizes it away
-      field :pictures, :rails_uploader
-    end
-  end
-end
-
-```
-
-### CarrierWave uploader - all like usual
-```ruby
-    # uploades/cover_uploader.rb
-    class CoverUploader < CarrierWave::Uploader::Base
-      include CarrierWave::MiniMagick
-
-      storage :file
-
-      def store_dir
-        "uploads/covers/#{model.id}"
-      end
-
-      version :thumb do
-        process resize_to_limit: [50, 50]
-      end
-    end
-```
-
-# Active Admin and RailsAdmin are both working
-
-# RailsAdmin Integration
-``` ruby
-    rails_admin do
-        edit do
-          ...
-          field :fileupload_guid, :hidden # this is needed or else rails_admin sanitizes it away
-          field :pictures, :rails_uploader
-        end
-    end
-```
-
-## Usage (Original description)
+## Usage
 
 Architecture to store uploaded files (cancan integration):
 
@@ -182,6 +61,17 @@ class Picture < Asset
 
   validates_integrity_of :data
   validates_filesize_of :data, :maximum => 2.megabytes.to_i
+
+  # structure of returned json array of files. (used in Hash.to_json operation)
+  def serializable_hash(options=nil)
+    {
+        "id" => id.to_s,
+        "filename" => File.basename(data.path),
+        "url" => data.url,
+        "thumb_url" => data.url(:thumb),
+        "public_token" => public_token
+    }
+  end
 end
 ```
 
@@ -206,66 +96,78 @@ Find asset by foreign key or guid:
 
 ### Mongoid
 
+No parent asset model is required, one only has to `include Uploader::Asset::Mongoid` into the
+model that should act like an asset:
+
 ``` ruby
-class Asset
+class Picture
   include Mongoid::Document
   include Uploader::Asset::Mongoid
 
-  belongs_to :assetable, polymorphic: true
-end
-
-class Picture < Asset
-  mount_uploader :data, ImageUploader
-
-  default_scope asc( :sort_order )
+  belongs_to :user
 end
 
 class User
   include Mongoid::Document
-  include Uploader::Fileuploads::Mongoid
+  include Uploader::Fileuploads
 
-  has_many :pictures, :as => :assetable
+  has_one :picture, :as => :assetable
 
-  fileuploads :pictures
+  fileuploads :picture
 end
 ```
+
+### Notice
+
+User method fileuploads only once pre model. So if you have many attached files, use this:
+
+``` ruby
+class User
+  include Uploader::Fileuploads
+
+  has_one :picture, :as => :assetable
+  has_one :avatar, :as => :assetable
+
+  fileuploads :picture, :avatar
+end
+```
+
 
 ### Include assets
 
 Javascripts:
 
-``` ruby
-//= require jquery.ui.widget
+```
 //= require uploader/application
 ```
 
 Stylesheets:
 
-``` ruby
+```
 *= require uploader/application
 ```
 
 ### Views
 
-``` ruby
+```erb
 <%= uploader_field_tag :article, :photo %>
 ```
 
 or FormBuilder:
 
-``` ruby
+```erb
 <%= form.uploader_field :photo, :sortable => true %>
 ```
 
 ### Formtastic
 
-``` ruby
+```erb
 <%= f.input :pictures, :as => :uploader %>
 ```
 
 ### SimpleForm
 
-``` ruby
+```erb
 <%= f.input :pictures, :as => :uploader, :input_html => {:sortable => true} %>
 ```
 
@@ -273,7 +175,7 @@ or FormBuilder:
 
 This is only working in Formtastic and FormBuilder:
 
-``` ruby
+``` erb
 # formtastic
 <%= f.input :picture, :as => :uploader, :confirm_delete => true %>
 # the i18n lookup key would be en.formtastic.delete_confirmations.picture

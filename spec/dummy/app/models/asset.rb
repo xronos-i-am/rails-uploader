@@ -1,20 +1,27 @@
-# encoding: utf-8
-
-class Asset 
-  include Mongoid::Document
+# == Schema Information
+#
+# Table name: assets
+#
+#  id                :integer(4)      not null, primary key
+#  data_file_name    :string(255)     not null
+#  data_content_type :string(255)
+#  data_file_size    :integer(4)
+#  assetable_id      :integer(4)      not null
+#  assetable_type    :string(25)      not null
+#  type              :string(25)
+#  guid              :string(10)
+#  user_id           :integer(4)
+#  sort_order        :integer(4)      default(0)
+#  created_at        :datetime
+#  updated_at        :datetime
+#
+# Indexes
+#
+#  index_assets_on_assetable_type_and_assetable_id           (assetable_type,assetable_id)
+#  index_assets_on_user_id                                   (user_id)
+#
+class Asset < ActiveRecord::Base
   include Uploader::Asset
-
-  belongs_to :assetable, polymorphic: true
-
-  field :guid
-
-  before_save do
-    return true if self.assetable_id.nil? || !self.assetable_id.is_a?(String)
-    if defined?(Moped::BSON)
-      self.assetable_id = Moped::BSON::ObjectId.from_string(self.assetable_id) if Moped::BSON::ObjectId.legal?(self.assetable_id)
-    else
-      self.assetable_id = BSON::ObjectId.from_string(self.assetable_id) if BSON::ObjectId.legal?(self.assetable_id)
-    end
-    true
-  end
+  
+  belongs_to :assetable, :polymorphic => true
 end

@@ -11,14 +11,12 @@ end
 
 class MongoidPicture
   include Mongoid::Document
-  include Uploader::Asset
-
-  field :guid
+  include Uploader::Asset::Mongoid
 
   belongs_to :assetable, polymorphic: true
 end
 
-describe Uploader::Asset do
+describe Uploader::Asset::Mongoid do
   before do
     @guid = 'guid'
     @picture = MongoidPicture.create!(:guid => @guid, :assetable_type => 'MongoidArticle')
@@ -30,9 +28,9 @@ describe Uploader::Asset do
   end
 
   it "should update asset target_id by guid" do
-    MongoidArticle.fileupload_update('507f1f77bcf86cd799439011', @picture.guid, :mongoid_picture)
+    MongoidArticle.fileupload_update(1000, @picture.guid, :mongoid_picture)
     @picture.reload
-    @picture.assetable_id.to_s.should == '507f1f77bcf86cd799439011'
+    @picture.assetable_id.should == 1000
     @picture.guid.should be_nil
   end
 

@@ -12,7 +12,7 @@ module Uploader
   end
 
   def self.guid
-    SecureRandom.base64(15).tr('+/=', 'xyz').slice(0, 10)
+    SecureRandom.base64(16).tr('+/=', 'xyz').slice(0, 20)
   end
   
   def self.root_path
@@ -20,9 +20,9 @@ module Uploader
   end
   
   def self.assets
-    ['uploader/application.css', 'uploader/application.js', 'uploader/rails_admin.js'] +
-    Dir[root_path.join('app/assets/javascripts/uploader/**', '*.{js,css}')].inject([]) do |list, path|
-      list << Pathname.new(path).relative_path_from(root_path.join('app/assets/javascripts')).to_s
+    Dir[root_path.join('vendor/assets/**/uploader/**', '*.{js,css,png,gif}')].inject([]) do |list, path|
+      folder = path.split('/assets/')[1].split('/')[0]
+      list << Pathname.new(path).relative_path_from(root_path.join("vendor/assets/#{folder}")).to_s
       list
     end
   end

@@ -1,3 +1,3 @@
 module Uploader
-  VERSION = "0.4.1".freeze
+  VERSION = "0.3.0".freeze
 end

@@ -8,9 +8,8 @@ Gem::Specification.new do |s|
   s.platform = Gem::Platform::RUBY 
   s.summary = "Rails file upload implementation with jQuery-File-Upload"
   s.description = "Rails HTML5 FileUpload helpers"
-  s.authors = ["GlebTv"]
-  s.email = "glebtv@gmail.com"
-  s.rubyforge_project = "rails-uploader"
+  s.authors = ["Igor Galeta", "Pavlo Galeta", "GlebTV"]
+  s.email = "superp1987@gmail.com"
   s.homepage = "https://github.com/glebtv/rails-uploader"
   
   s.files = Dir["{app,lib,config,vendor}/**/*"] + ["MIT-LICENSE", "Rakefile", "README.md"]
@@ -18,13 +17,9 @@ Gem::Specification.new do |s|
   s.extra_rdoc_files = ["README.md"]
   s.require_paths = ["lib"]
   
-  s.add_dependency "mongoid", [">= 4.0.0.alpha1", "< 5.0"]
-  
-  s.add_development_dependency "glebtv-carrierwave-mongoid"
-  s.add_development_dependency "rails", ">= 3.2.13"
-  s.add_development_dependency "mini_magick"
-  s.add_development_dependency "jquery-rails"
-  s.add_development_dependency "rspec-rails"
-  s.add_development_dependency "factory_girl_rails"
-  s.add_development_dependency "database_cleaner"
+  s.add_dependency "jquery-ui-rails"
+
+  s.add_development_dependency "sqlite3"
+  s.add_development_dependency "carrierwave"
+  s.add_development_dependency "mongoid"
 end
