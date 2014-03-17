@@ -11,7 +11,7 @@ Preview:
 In Gemfile:
 
 ```
-gem "rails-uploader"
+gem "glebtv-rails-uploader"
 ```
 
 In routes:
