@@ -569,7 +569,6 @@
         },
 
         _renderDownload: function (files) {
-            console.log(files);
             return this._renderTemplate(
                 this.options.downloadTemplate,
                 files

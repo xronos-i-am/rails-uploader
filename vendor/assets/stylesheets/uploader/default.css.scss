@@ -17,18 +17,18 @@
   clear: both;
 }
 .uploader-dnd-hints .uploader-button {
-  margin: 0 20px 0 200px;
+  margin: 0 20px 0 20px;
   width: 222px;
   float: left;
 }
 .uploader-dnd-hints .uploader-dnd-hint {
   float: left;
-  line-height: 30px;
+  line-height: 22px;
   font-size: 12px;
 }
 .uploader-dnd-hints .uploader-dnd-hint span {
   padding: 10px 30px;
-  background: url(/assets/uploader/ico_attach.png) no-repeat 9px center;
+  background: image-url('uploader/ico_attach.png') no-repeat 9px center;
 }
 .uploader-dnd-hints input.uploader {
   height: 31px;
@@ -53,7 +53,7 @@
 	font-weight: bold;
 	text-shadow: 0 1px 0 #000;
 	cursor: pointer;
-	height: 31px;
+	height: 22px;
 }
 .uploader-button:hover {
 	background: #972da0;
@@ -153,7 +153,7 @@ input[disabled].uploader-button.gray {
   position: absolute;
   top: -10px;
   right: -10px;
-  background: url(/assets/uploader/but_del_tag2.png) no-repeat top left;
+  background: image-url('uploader/but_del_tag2.png') no-repeat top left;
 }
 .uploader-dnd-area .attach_item .del_btn:hover {
   background-position: bottom left;
@@ -198,7 +198,7 @@ input[disabled].uploader-button.gray {
 }
 .uploader-dnd-area .attach_item .progressBar .fill {
   height: 8px;
-  background: url(/assets/uploader/progressBarFillBg.png) repeat-x;
+  background: image-url('uploader/progressBarFillBg.png') repeat-x;
 }
 
 .uploader-dnd-area .attach_item.loading .progressBar {
