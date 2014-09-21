@@ -21,7 +21,8 @@ module Uploader
 
       if Object.const_defined?("SimpleForm")
         require "uploader/hooks/simple_form"
-      elsif Object.const_defined?("Formtastic")
+      end
+      if Object.const_defined?("Formtastic")
         require "uploader/hooks/formtastic" 
       end
     end

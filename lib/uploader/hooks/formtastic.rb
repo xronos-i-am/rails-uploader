@@ -1,6 +1,6 @@
 require 'formtastic'
 
-class UploaderInput
+class FormtasticUploaderInput
   include ::Formtastic::Inputs::Base
   
   def to_html
@@ -17,3 +17,4 @@ class UploaderInput
     data
   end
 end
+
