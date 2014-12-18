@@ -44,7 +44,7 @@
           uploader = ($(this).data('blueimp-fileupload') || $(this).data('fileupload'));
           <% fv = field.values.sort_by {|s| s.sort.nil? ? 0 : s.sort }.map(&:to_jq_upload) %>
           uploader
-            ._renderDownload(<%=raw (field.multiple? ? fv : fv[0]).to_json %>)
+            ._renderDownload(<%=raw Array.wrap(fv).to_json %>)
             .appendTo(container);
         <% end -%>
       });
