@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    glebtv-rails-uploader (0.7.1)
+    glebtv-rails-uploader (0.8.0)
       jquery-ui-rails
 
 GEM
