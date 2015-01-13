@@ -2,7 +2,7 @@ source "https://rubygems.org"
 
 gemspec
 
-gem "rails", "3.2.19"
+gem "rails", "~> 4.2.0"
 gem "sqlite3"
 gem "mini_magick"
 

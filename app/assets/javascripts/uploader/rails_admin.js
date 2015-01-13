@@ -1,5 +1,5 @@
-//= require uploader/jquery.ui.widget
-//= require uploader/jquery.ui.sortable
+//= require jquery-ui/widget
+//= require jquery-ui/sortable
 //= require uploader/locales/en
 //= require uploader/tmpl.min
 //= require uploader/load-image.min
